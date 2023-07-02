@@ -12,15 +12,17 @@ class User
     {
         $this->db = MysqliDb::getInstance();
     }
-    public function login($username, $password, $remember = false)
+    public function login($username, $password, $remember)
     {
+  
         if ($this->authenticate($username, $password)) {
             $this->setUserSession($username);
-
+          
             // Thiết lập remember token khi đăng nhập thành công và tùy chọn Remember Me được chọn
             if ($remember) {
                 $token = $this->generateRememberToken();
                 $this->setRememberToken($token);
+                $this->saveRememberTokenToDatabase($username, $token);
             }
             
             return true;
@@ -158,6 +160,12 @@ class User
         return $this->db
             ->where('remember_token', $token)
             ->getOne($this->tableName, ['id', 'user_login']);
+    }
+    protected function saveRememberTokenToDatabase($username, $token)
+    {
+        $this->db
+            ->where('user_login', $username)
+            ->update($this->tableName, ['remember_token' => $token]);
     }
 }
 ?>
