@@ -9,6 +9,7 @@ define('DB_PASS', '123456');
 define('DB_NAME', 'test_codethuan_mvc');
 
 //App Root
+define('SITE_URL', 'http://localhost/codethuan/simple-mvc-php-framework');
 define('APP_ROOT', dirname(dirname(__FILE__)));
 
 define('URL_ROOT', '/');
