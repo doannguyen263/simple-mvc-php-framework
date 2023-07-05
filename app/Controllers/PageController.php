@@ -8,22 +8,21 @@ use Symfony\Component\Routing\RouteCollection;
 
 class PageController
 {
-	protected $user;
+	protected $userModel;
 
 	public function __construct()
     {
-    	$user = new User();
-        $this->user = $user;
+    	$userModel = new User();
+      $this->userModel = $userModel;
     }
     // Homepage action
 	public function indexAction(RouteCollection $routes)
 	{
 		session_start();
-		$this->user->checkAuthentication();
+		$checkAuthentication = $this->userModel->checkAuthentication();
+		$this->userModel->checkRole(['admin']);
 
-		$this->user->checkRole(['admin']);
-
-		$routeToProduct = str_replace('{id}', 1, $routes->get('product')->getPath());
+		// $routeToProduct = str_replace('{id}', 1, $routes->get('product')->getPath());
 
     require_once URL_VIEWS_ADMIN . '/pages/index.php';
 	}

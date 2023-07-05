@@ -1,10 +1,12 @@
 <?php
 require_once URL_VIEWS_ADMIN . '/layout/header.php';
+$password_hash = password_hash('admin', PASSWORD_DEFAULT);
+print_r($password_hash);
 ?>
 <div class="hold-transition login-page">
 	<div class="login-box">
 		<div class="login-logo">
-			<a href="../../index2.html"><b>Admin Login</a>
+			<a href="<?= SITE_URL ?>"><b>Admin Login</a>
 		</div>
 
 		<div class="card">

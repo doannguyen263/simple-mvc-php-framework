@@ -1,81 +1,147 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\User;
+use App\Helpers\CSRFTokenTrait;
 use Symfony\Component\HttpFoundation\Request;
+use App\Models\User;
 
 class UserController
 {
-    protected $user;
+    use CSRFTokenTrait;
+    protected $userModel;
+    protected $request;
 
     public function __construct()
     {
-        $modelUser = new User;
-        $this->user = $modelUser;
-    }
-
-    public function login()
-    {
         session_start();
-        $errors = '';
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = isset($_POST['username']) ? $_POST['username'] : '';
-            $password = isset($_POST['password']) ? $_POST['password'] : '';
-            $remember = isset($_POST['remember']) ? $_POST['remember'] : false;
+        $modelUser = new User;
+        $modelUser->checkAuthentication();
+
+        $this->userModel = $modelUser;
+        $this->request = Request::createFromGlobals();
+    }
+
+    public function index()
+    {
+        // Lấy danh sách người dùng từ model
+        $userModel = new User();
+        $users = $userModel->getAllUsers();
+
+        // Gọi view để hiển thị danh sách người dùng
+        require_once URL_VIEWS_ADMIN . '/user/index.php';
+    }
+    public function create()
+    {
+        // Lấy danh sách người dùng từ model
+        $users = $this->userModel->getAllUsers();
+
+        // Gọi view để hiển thị danh sách người dùng
+        require_once URL_VIEWS_ADMIN . '/user/index.php';
+    }
+    public function store()
+    {
+        $users = $this->userModel->getAllUsers();
+        // Gọi view để hiển thị danh sách người dùng
+        require_once URL_VIEWS_ADMIN . '/user/index.php';
+    }
+    public function edit()
+    {
+        $userId = $this->request->get('user_id');
+
+        // Kiểm tra xem có truyền vào $userId không
+        if ($userId == null) {
+            // Nếu không truyền vào, lấy userId từ session
+            $userId = $_SESSION['user']['id'];
+        }
+    
+        $response = $this->update();
+
+        $user = $this->userModel->getUserById($userId);
+
+        if (!$user) {
+            die('ID người dùng không hợp lệ.');
+        }
+
+        // Hiển thị form chỉnh sửa thông tin người dùng
+        require_once URL_VIEWS_ADMIN . '/user/edit.php';
+    }
+
+    public function update(){
+        if ($this->request->isMethod('POST')) {
+
+            $userId = $this->request->get('user_id');
+            $user_fullname = $this->request->get('user_fullname');
+            $user_pass = $this->request->get('user_pass');
+            $csrf_user_edit_token = $this->request->get('csrf_user_edit_token');
+
+            $verifyCSRFToken = $this->verifyCSRFToken($csrf_user_edit_token, 'csrf_user_edit_token');
             
-			$auth = $this->user->login($username, $password, $remember);
-            if (!$auth) {
-                $errors = 'Tài khoản hoặc mật khẩu sai!';
+            if(!$verifyCSRFToken) {
+                return [
+                    'status' => 'error',
+                    'message' => 'verifyCSRFToken. Cập nhật thất bại.'
+                ];
             }
-        }
 
-        $request = Request::createFromGlobals();
-        if ($_SERVER['REQUEST_METHOD'] === 'GET' &&  $request->query->get('action') == 'logout') { 
-            $this->user->logout();
-        }
+            $data = array(
+                'user_fullname' => $user_fullname,
+            );
+            $result = $this->userModel->updateUser($userId, $data);
 
-        if($this->user->isLoggedIn()) {
-            header("Location: ".SITE_URL);
-	        exit;
-        }else {
-            require_once URL_VIEWS_ADMIN . '/auth/login.php';
-        }
-    }
-
-    public function register()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $password = $_POST['password'];
-
-            if ($this->user->register($username, $password)) {
-                // Đăng ký thành công
-                // Chuyển hướng hoặc thực hiện các thao tác khác
+            if ($result) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Cập nhật thành công.'
+                ];
             } else {
-                // Đăng ký thất bại
-                // Hiển thị thông báo lỗi hoặc thực hiện các thao tác khác
+                return [
+                    'status' => 'error',
+                    'message' => 'Cập nhật thất bại.'
+                ];
             }
         }
-
-        // Hiển thị giao diện đăng ký
     }
 
-    public function logout()
+    public function updatePassword()
     {
-        $this->user->logout();
+        // Kiểm tra xem người dùng đã đăng nhập chưa
+        if (!$this->userModel->isLoggedIn()) {
+            // Xử lý khi chưa đăng nhập
+            return false;
+        }
+      
+        // Lấy thông tin người dùng từ session
+        $user = $_SESSION['user'];
 
-        // Chuyển hướng hoặc thực hiện các thao tác khác sau khi đăng xuất
+        // Lấy mật khẩu cũ từ form
+        $oldPassword = $_POST['old_password'];
+
+        // Kiểm tra mật khẩu cũ có khớp với mật khẩu hiện tại trong database không
+        if (!$this->userModel->verifyPassword($oldPassword, $user['password'])) {
+            // Xử lý khi mật khẩu cũ không khớp
+            return false;
+        }
+
+        // Lấy mật khẩu mới từ form
+        $newPassword = $_POST['new_password'];
+
+        // Hash mật khẩu mới
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        // Cập nhật mật khẩu trong database
+        $this->userModel->updatePassword($user['id'], $hashedPassword);
+
+        // Hiển thị thông báo thành công
+        $this->setFlashMessage('success', 'Cập nhật mật khẩu thành công.');
+
+        // Chuyển hướng về trang chủ hoặc trang cá nhân
+        header('Location: /');
+        exit;
     }
 
     public function profile()
     {
-        if ($this->user->isLoggedIn()) {
-            $user = $_SESSION['user'];
 
-            // Hiển thị giao diện thông tin người dùng
-        } else {
-            // Người dùng chưa đăng nhập, chuyển hướng hoặc thực hiện các thao tác khác
-        }
     }
 }
 ?>
