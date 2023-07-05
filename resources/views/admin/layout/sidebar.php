@@ -1,5 +1,7 @@
+<?php 
+$user_name = $_SESSION['user']['user_login'] ?? '';
+?>
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-
   <ul class="navbar-nav">
     <li class="nav-item">
       <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
@@ -11,18 +13,14 @@
       <a href="#" class="nav-link">Contact</a>
     </li>
   </ul>
-
   <ul class="navbar-nav ml-auto">
-
-
-
     <div class="nav-item dropdown user-menu">
       <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="public/images/user.png" class="user-image img-circle elevation-2" alt="User Image">
-        <span class="d-none d-md-inline">Alexander Pierce</span>
+        <span class="d-none d-md-inline"><?= $user_name ?></span>
       </button>
       <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user-gear"></i> Hồ sơ</a></li>
+        <li><a class="dropdown-item" href="<?= SITE_URL . '/user-edit' ?>"><i class="fa-solid fa-user-gear"></i> Hồ sơ</a></li>
         <li><a class="dropdown-item" href="<?= SITE_URL . '/login?action=logout' ?>"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a></li>
       </ul>
     </div>
@@ -41,31 +39,6 @@
     <nav class="mt-3 pb-3 mb-3">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item">
-          <a href="../gallery.html" class="nav-link">
-            <i class="nav-icon far fa-image"></i>
-            <p>
-              Example
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="../gallery.html" class="nav-link">
-            <i class="nav-icon far fa-image"></i>
-            <p>
-              Example
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="../gallery.html" class="nav-link">
-            <i class="nav-icon far fa-image"></i>
-            <p>
-              Example
-            </p>
-          </a>
-        </li>
-
-        <li class="nav-item">
           <a href="#" class="nav-link">
             <i class="nav-icon fa-solid fa-users"></i>
             <p>
@@ -75,19 +48,19 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="../../index.html" class="nav-link">
+              <a href="<?= SITE_URL . '/user-index' ?>" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Danh sách</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="../../index2.html" class="nav-link">
+              <a href="<?= SITE_URL . '/user-create' ?>" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Thêm mới</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="../../index3.html" class="nav-link">
+              <a href="<?= SITE_URL . '/user-edit' ?>" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Hồ sơ</p>
               </a>

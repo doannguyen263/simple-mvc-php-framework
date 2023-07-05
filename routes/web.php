@@ -12,17 +12,39 @@ $routes->add('homepage', new Route(constant('URL_SUBFOLDER') . '/',
   ), 
   array('POST')
 ));
-$routes->add('product', new Route(constant('URL_SUBFOLDER') . '/product/{id}', 
-  array(
-    'controller' => 'ProductController', 
-    'method'=>'showAction'
-  ),
-  array('id' => '[0-9]+')
-));
 
+// Auth
 $routes->add('login', new Route(constant('URL_SUBFOLDER') .'/login',
   array(
-    'controller' => 'UserController',
+    'controller' => 'AuthController',
     'method'=>'login'
   ),
+));
+
+// 
+$routes->add('user.index', new Route(constant('URL_SUBFOLDER') .'/user-index',
+  array(
+    'controller' => 'UserController',
+    'method'=>'index'
+  )
+));
+
+$routes->add('user.create', new Route(constant('URL_SUBFOLDER') .'/user-create',
+  array(
+    'controller' => 'UserController',
+    'method'=>'create'
+  )
+));
+$routes->add('user.create', new Route(constant('URL_SUBFOLDER') .'/user-create',
+  array(
+    'controller' => 'UserController',
+    'method'=>'store'
+  )
+));
+
+$routes->add('user.edit', new Route(constant('URL_SUBFOLDER') .'/user-edit',
+  array(
+    'controller' => 'UserController',
+    'method'=>'edit'
+  )
 ));
