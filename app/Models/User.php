@@ -185,22 +185,47 @@ class User
         $data = array_intersect_key(
             $dataArray, 
             [
-                'user_fullname' => '', 
-                'user_pass' => ''
+                'user_fullname' => '',
             ]
         );
-
-        if (isset($data['user_pass'])) {
-            $data['user_pass'] = password_hash($data['user_pass'], PASSWORD_DEFAULT);
-        }
-
+    
         if (empty($data)) {
             return false; // Hoặc xử lý theo nhu cầu của bạn
         }
 
         $this->db->where('id', $userId);
         $this->db->update($this->tableName, $data);
-
         return $this->db->count;
+    }
+    public function verifyPassword($userId, $password)
+    {
+        $user = $this->db
+            ->where('id', $userId)
+            ->getOne($this->tableName, ['id', 'user_pass']);
+
+            
+        print_r('verifyPassword load'.'<br>');
+        print_r('oldPassword load: '.  $user.'<br>');
+        print_r('new_password load: '. $user['user_pass'].'<br>');
+        die(1);
+
+
+        if ($user && password_verify($password, $user['user_pass'])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public function updatePassword($userId, $newPassword)
+    {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $data = [
+            'user_pass' => $hashedPassword
+        ];
+        
+        $this->db
+            ->where('id', $userId)
+            ->update($this->tableName, $data);
     }
 }

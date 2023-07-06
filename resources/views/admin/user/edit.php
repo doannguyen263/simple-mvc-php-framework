@@ -29,7 +29,7 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
           <div class="card card-default color-palette-box">
 
             <div class="card-body">
-              <form method="POST">
+              <form method="POST" class="mb-3">
               <p class="text-uppercase"><strong>Cập nhật thông tin</strong></p>
               <hr>
                 <div class="row mb-3">
@@ -65,7 +65,7 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
                     <label for="formPassword">Mật khẩu hiện tại</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="password" name="user_pass" class="form-control" id="formPassword" placeholder="Password">
+                    <input type="password" name="old_password" class="form-control" id="formPassword" placeholder="Password">
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -73,7 +73,7 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
                     <label for="formPassword">Mật khẩu mới</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="password" name="user_pass_new" class="form-control" id="formPassword" placeholder="Password">
+                    <input type="password" name="new_password" class="form-control" id="formPassword" placeholder="Password">
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -90,17 +90,8 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
                 <input type="hidden" name="user_id" id="user_id" value="<?= $userId ?>">
                 <?= $this->generateCSRFTokenInput('csrf_user_edit_token') ?>
               </form>
-              
-              <?php
-                if(isset($response)) {
-                  $response_class= $response['status'] == 'success' ? 'primary' : 'danger';
-                  ?>
-                  <div class="alert alert-<?= $response_class ?> mt-3" role="alert">
-                  <?php print_r($response['message']); ?>
-                  </div>
-                  <?php
-                }
-              ?>
+
+              <?php $this->displayFlashMessage();?>
             </div>
 
           </div>

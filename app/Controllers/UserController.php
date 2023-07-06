@@ -2,12 +2,14 @@
 namespace App\Controllers;
 
 use App\Helpers\CSRFTokenTrait;
+use App\Helpers\FlashMessage;
 use Symfony\Component\HttpFoundation\Request;
 use App\Models\User;
 
 class UserController
 {
     use CSRFTokenTrait;
+    use FlashMessage;
     protected $userModel;
     protected $request;
 
@@ -71,16 +73,13 @@ class UserController
 
             $userId = $this->request->get('user_id');
             $user_fullname = $this->request->get('user_fullname');
-            $user_pass = $this->request->get('user_pass');
+            $new_password = $this->request->get('new_password');
             $csrf_user_edit_token = $this->request->get('csrf_user_edit_token');
 
             $verifyCSRFToken = $this->verifyCSRFToken($csrf_user_edit_token, 'csrf_user_edit_token');
             
             if(!$verifyCSRFToken) {
-                return [
-                    'status' => 'error',
-                    'message' => 'verifyCSRFToken. Cập nhật thất bại.'
-                ];
+                $this->setFlashMessage('error','verifyCSRFToken. Cập nhật thất bại.');
             }
 
             $data = array(
@@ -89,53 +88,48 @@ class UserController
             $result = $this->userModel->updateUser($userId, $data);
 
             if ($result) {
-                return [
-                    'status' => 'success',
-                    'message' => 'Cập nhật thành công.'
-                ];
+                $this->setFlashMessage('success', 'Cập nhật thông tin người dùng thành công.');
             } else {
-                return [
-                    'status' => 'error',
-                    'message' => 'Cập nhật thất bại.'
-                ];
+                $this->setFlashMessage('error', 'Cập nhật thông tin người dùng thất bại.');
             }
+
+            if (!empty($new_password)) {
+                $passwordResult = $this->updatePassword($userId, $new_password);
+                if ($passwordResult) {
+                    $this->setFlashMessage('success', 'Cập nhật mật khẩu thành công.');
+                } else {
+                    $this->setFlashMessage('error', 'Cập nhật mật khẩu thất bại.');
+                }
+            }
+            // Thực hiện redirect về trang hiện tại sau khi cập nhật
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit;
         }
     }
 
-    public function updatePassword()
+    public function updatePassword($userId, $new_password)
     {
-        // Kiểm tra xem người dùng đã đăng nhập chưa
-        if (!$this->userModel->isLoggedIn()) {
-            // Xử lý khi chưa đăng nhập
-            return false;
-        }
-      
-        // Lấy thông tin người dùng từ session
-        $user = $_SESSION['user'];
-
         // Lấy mật khẩu cũ từ form
-        $oldPassword = $_POST['old_password'];
+        $oldPassword = $this->request->get('old_password');
 
         // Kiểm tra mật khẩu cũ có khớp với mật khẩu hiện tại trong database không
-        if (!$this->userModel->verifyPassword($oldPassword, $user['password'])) {
+        if (!$this->userModel->verifyPassword($oldPassword, $new_password)) {
             // Xử lý khi mật khẩu cũ không khớp
             return false;
         }
-
-        // Lấy mật khẩu mới từ form
-        $newPassword = $_POST['new_password'];
-
+        print_r('verifyPassword true');
+        die(1);
         // Hash mật khẩu mới
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
 
         // Cập nhật mật khẩu trong database
-        $this->userModel->updatePassword($user['id'], $hashedPassword);
+        $this->userModel->updatePassword($userId, $hashedPassword);
 
         // Hiển thị thông báo thành công
         $this->setFlashMessage('success', 'Cập nhật mật khẩu thành công.');
 
         // Chuyển hướng về trang chủ hoặc trang cá nhân
-        header('Location: /');
+        header("Location: " . $_SERVER['HTTP_REFERER']);
         exit;
     }
 
