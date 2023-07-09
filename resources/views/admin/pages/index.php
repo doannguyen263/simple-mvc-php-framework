@@ -1,10 +1,12 @@
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/header.php';
+use App\Helpers\View;
+use App\Helpers\FlashMessage;
+View::renderHeader();
 ?>
 <div class="hold-transition sidebar-mini">
     <div class="wrapper">
         <?php
-        require_once URL_VIEWS_ADMIN . '/layout/sidebar.php';
+        require_once PATH_VIEWS_ADMIN . '/layout/sidebar.php';
         ?>
         <div class="content-wrapper">
 
@@ -26,6 +28,14 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
 
 
             <div class="content">
+            <?php 
+            if(FlashMessage::hasFlashMessage()){
+                echo '<div class="mb-3">';
+                FlashMessage::displayFlashMessage();
+                echo '</div>';
+            }
+            ?>
+            
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-lg-6">
@@ -64,5 +74,5 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
     </div>
 </div>
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/footer.php';
+View::renderFooter();
 ?>

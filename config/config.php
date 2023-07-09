@@ -12,7 +12,13 @@ define('DB_NAME', 'test_codethuan_mvc');
 define('SITE_URL', 'http://localhost/codethuan/simple-mvc-php-framework');
 define('APP_ROOT', dirname(dirname(__FILE__)));
 
-define('URL_ROOT', '/');
-define('URL_SUBFOLDER', '/codethuan/simple-mvc-php-framework');
-define('URL_VIEWS', APP_ROOT.'/resources/views');
-define('URL_VIEWS_ADMIN', APP_ROOT.'/resources/views/admin');
+// PATH
+define('PATH_ROOT', '/');
+define('PATH_SUBFOLDER', '/codethuan/simple-mvc-php-framework');
+
+define('PATH_VIEWS_CORE', APP_ROOT.'/resources/views/core');
+define('PATH_VIEWS', APP_ROOT.'/resources/views');
+define('PATH_VIEWS_ADMIN', APP_ROOT.'/resources/views/admin');
+
+// URL
+define('URL_PUBLIC_ADMIN', SITE_URL.'/public/admin');
