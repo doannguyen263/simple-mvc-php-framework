@@ -8,7 +8,7 @@
 > 3. Go to the index page (often localhost).
 Note: if you decided to put the framework into a subfolder, open /config/config.php and set up the name of the subfolder here URL_SUBFOLDER
 > ## Run Project:
-> composer install;
-> setting in file config/config.php;
-> import database;
-> Important: set folder PATH_SUBFOLDER;
+> 1. composer install;
+> 2. setting in file config/config.php;
+> 3. import database;
+> 4. Important: set folder PATH_SUBFOLDER;
