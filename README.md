@@ -10,5 +10,5 @@ Note: if you decided to put the framework into a subfolder, open /config/config.
 > ## Run Project:
 > 1. composer install;
 > 2. setting in file config/config.php;
-> 3. import database;
+> 3. use Xampp for localhost. import database;
 > 4. Important: set folder PATH_SUBFOLDER;
