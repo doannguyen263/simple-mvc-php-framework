@@ -2,28 +2,36 @@
 
 namespace App\Controllers;
 
-use App\Models\User;
-
 use Symfony\Component\Routing\RouteCollection;
+
+use App\Helpers\View;
+
+use App\Models\Auth;
+use App\Models\User;
 
 class PageController
 {
+	protected $userAuth;
 	protected $userModel;
 
 	public function __construct()
     {
     	$userModel = new User();
       $this->userModel = $userModel;
+
+			$userAuth = new Auth();
+      $this->userAuth = $userAuth;
     }
     // Homepage action
 	public function indexAction(RouteCollection $routes)
 	{
 		session_start();
-		$checkAuthentication = $this->userModel->checkAuthentication();
-		$this->userModel->checkRole(['admin']);
+		$this->userAuth->checkRole(['admin']);
 
 		// $routeToProduct = str_replace('{id}', 1, $routes->get('product')->getPath());
-
-    require_once URL_VIEWS_ADMIN . '/pages/index.php';
+		View::render('admin/pages/index');
+	}
+	function layoutExample(){
+		View::render('layout-example');
 	}
 }

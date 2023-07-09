@@ -2,67 +2,70 @@
 namespace App\Controllers;
 
 use Symfony\Component\HttpFoundation\Request;
-use App\Models\User;
+use App\Helpers\View;
+use App\Helpers\FlashMessage;
+use App\Helpers\CSRFTokenTrait;
+use App\Models\Auth;
 
 class AuthController
 {
+    use FlashMessage;
+    use CSRFTokenTrait;
+
     protected $userModel;
     protected $request;
+    protected $auth;
 
     public function __construct()
     {
-      $modelUser = new User;
-      $this->userModel = $modelUser;
+      $modelAuth = new Auth;
+      $this->auth = $modelAuth;
       $this->request = Request::createFromGlobals();
     }
 
     public function login()
     {
         session_start();
-        $errors = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = isset($_POST['username']) ? $_POST['username'] : '';
-            $password = isset($_POST['password']) ? $_POST['password'] : '';
-            $remember = isset($_POST['remember']) ? $_POST['remember'] : false;
-			      $auth = $this->userModel->login($username, $password, $remember);
+            $username = $this->request->get('username');
+            $password = $this->request->get('password');
+            $remember = $this->request->get('remember');
+            $csrf_login_token = $this->request->get('csrf_login_token');
+
+            $verifyCSRFToken = CSRFTokenTrait::verifyCSRFToken($csrf_login_token, 'csrf_login_token');
+    
+            if(!$verifyCSRFToken) {
+                FlashMessage::setFlashMessage('error','verifyCSRFToken. Cập nhật thất bại.');
+            }
+
+		    $auth = $this->auth->login($username, $password, $remember);
             if (!$auth) {
-                $errors = 'Tài khoản hoặc mật khẩu sai!';
+                FlashMessage::error('Tài khoản hoặc mật khẩu sai!');
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
             }
         }
 
         $request = Request::createFromGlobals();
         if ($_SERVER['REQUEST_METHOD'] === 'GET' &&  $request->query->get('action') == 'logout') { 
-            $this->userModel->logout();
+            $this->auth->logout();
         }
 
-        if($this->userModel->isLoggedIn()) {
+        if($this->auth->isLoggedIn()) {
             header("Location: ".SITE_URL);
 	        exit;
-        }else {
-            require_once URL_VIEWS_ADMIN . '/auth/login.php';
         }
+
+        View::render('admin/auth/login');
     }
 
     public function register()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $password = $_POST['password'];
-
-            if ($this->userModel->register($username, $password)) {
-                // Đăng ký thành công
-                // Chuyển hướng hoặc thực hiện các thao tác khác
-            } else {
-                // Đăng ký thất bại
-                // Hiển thị thông báo lỗi hoặc thực hiện các thao tác khác
-            }
-        }
-
-        // Hiển thị giao diện đăng ký
+        // Incoming
     }
 
     public function logout()
     {
-        $this->userModel->logout();
+        $this->auth->logout();
     }
 }

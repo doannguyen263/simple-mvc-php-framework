@@ -1,10 +1,10 @@
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/header.php';
+require_once PATH_VIEWS_ADMIN . '/layout/header.php';
 ?>
 <div class="hold-transition sidebar-mini">
     <div class="wrapper">
         <?php
-        require_once URL_VIEWS_ADMIN . '/layout/sidebar.php';
+        require_once PATH_VIEWS_ADMIN . '/layout/sidebar.php';
         ?>
         <div class="content-wrapper">
 
@@ -19,6 +19,7 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
                             <li class="breadcrumb-item"><a href="<?= SITE_URL ?>">Home</a></li>
                                 <li class="breadcrumb-item active">Starter Page</li>
                             </ol>
+                            <a href="<?php echo $routes->get('homepage')->getPath(); ?>">Back to homepage</a>
                         </div>
                     </div>
                 </div>
@@ -64,5 +65,5 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
     </div>
 </div>
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/footer.php';
+require_once PATH_VIEWS_ADMIN . '/layout/footer.php';
 ?>

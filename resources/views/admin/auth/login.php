@@ -1,5 +1,7 @@
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/header.php';
+use App\Helpers\FlashMessage;
+use App\Helpers\CSRFTokenTrait;
+require_once PATH_VIEWS_ADMIN . '/layout/header.php';
 // Tao pass
 // $password_hash = password_hash('admin', PASSWORD_DEFAULT);
 // print_r($password_hash);
@@ -13,7 +15,7 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
 		<div class="card">
 			<div class="card-body login-card-body">
 				<p class="login-box-msg">Sign in to start your session</p>
-				<form action="login" method="post">
+				<form action="login" method="post" class="mb-3">
 					<div class="input-group mb-3">
 						<input type="text" name="username" class="form-control" placeholder="Username" value="admin">
 						<div class="input-group-append">
@@ -42,23 +44,17 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
 
 						<div class="col-5">
 							<button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+							<?= CSRFTokenTrait::generateCSRFTokenInput('csrf_login_token') ?>
 						</div>
-
 					</div>
 				</form>
 
-				<?php if ($errors) : ?>
-					<div class="text-danger mt-4">
-						<?php
-						print_r($errors);
-						?>
-					</div>
-				<?php endif; ?>
+				<?php FlashMessage::displayFlashMessage();?>
 
 			</div>
 		</div>
 	</div>
 </div>
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/footer.php';
+require_once PATH_VIEWS_ADMIN . '/layout/footer.php';
 ?>

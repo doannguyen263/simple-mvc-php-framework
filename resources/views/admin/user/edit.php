@@ -1,18 +1,27 @@
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/header.php';
+use App\Helpers\View;
+use App\Helpers\FlashMessage;
+use App\Helpers\CSRFTokenTrait;
+View::renderHeader();
 ?>
 <div class="hold-transition sidebar-mini">
   <div class="wrapper">
     <?php
-    require_once URL_VIEWS_ADMIN . '/layout/sidebar.php';
+    require_once PATH_VIEWS_ADMIN . '/layout/sidebar.php';
     ?>
     <div class="content-wrapper">
 
       <div class="content-header">
         <div class="container-fluid">
           <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">Edit user</h1>
+            <div class="col-sm-6 d-flex align-items-center">
+              <h1 class="me-3">Sửa user</h1>
+              <a class="btn btn-info btn-sm" href="<?= SITE_URL ?>/user-create">
+                <i class="fa-solid fa-user-plus"></i>
+                </i>
+                Thêm User
+              </a>
+
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
@@ -65,7 +74,7 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
                     <label for="formPassword">Mật khẩu hiện tại</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="password" name="old_password" class="form-control" id="formPassword" placeholder="Password">
+                    <input type="password" name="current_password" class="form-control" id="formPassword" placeholder="Password">
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -81,17 +90,17 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
                     <label for="formPassword">Nhập lại Mật khẩu mới</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="password" name="user_pass_confirm" class="form-control" id="formPassword" placeholder="Password">
+                    <input type="password" name="confirm_password" class="form-control" id="formPassword" placeholder="Password">
                   </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
                 <input type="hidden" name="action" value="update">
-                <input type="hidden" name="user_id" id="user_id" value="<?= $userId ?>">
-                <?= $this->generateCSRFTokenInput('csrf_user_edit_token') ?>
+                <input type="hidden" name="user_id" id="user_id" value="<?= $user['ID'] ?>">
+                <?= CSRFTokenTrait::generateCSRFTokenInput('csrf_user_edit_token') ?>
               </form>
 
-              <?php $this->displayFlashMessage();?>
+              <?php FlashMessage::displayFlashMessage();?>
             </div>
 
           </div>
@@ -103,5 +112,5 @@ require_once URL_VIEWS_ADMIN . '/layout/header.php';
   </div>
 </div>
 <?php
-require_once URL_VIEWS_ADMIN . '/layout/footer.php';
+View::renderFooter();
 ?>
