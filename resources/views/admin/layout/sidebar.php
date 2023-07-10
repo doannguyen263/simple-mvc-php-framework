@@ -29,29 +29,6 @@ $menus = array(
         'route' => 'user-edit'
       )
     )
-  ),
-  array(
-    'name' => 'User',
-    'link' => SITE_URL . '/user-index',
-    'route' => 'user2-index',
-    'icon' => 'fa-solid fa-book',
-    'submenu' => array(
-      array(
-        'name' => 'Danh sách',
-        'link' => SITE_URL . '/user-index',
-        'route' => 'user2-index'
-      ),
-      array(
-        'name' => 'Thêm mới',
-        'link' => SITE_URL . '/user-create',
-        'route' => 'user2-create'
-      ),
-      array(
-        'name' => 'Hồ sơ',
-        'link' => SITE_URL . '/user-edit',
-        'route' => 'user2-edit'
-      )
-    )
   )
 );
 
