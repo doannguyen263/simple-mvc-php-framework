@@ -29,31 +29,22 @@ $routes->add('login', new Route(constant('PATH_SUBFOLDER') .'/login',
   ),
 ));
 
-// 
-$routes->add('user-index', new Route(constant('PATH_SUBFOLDER') .'/user-index',
-  array(
-    'controller' => 'UserController',
-    'method'=>'index'
-  )
-));
+function addRoutes($routes, $routesData, $controller)
+{
+    foreach ($routesData as $routeData) {
+        $routePath = constant('PATH_SUBFOLDER') . $routeData['path'];
+        $routes->add($routeData['name'], new Route($routePath, array(
+            'controller' => $controller,
+            'method' => $routeData['method']
+        )));
+    }
+}
 
-$routes->add('user-create', new Route(constant('PATH_SUBFOLDER') .'/user-create',
-  array(
-    'controller' => 'UserController',
-    'method'=>'create'
-  )
-));
+$routesDataUser = array(
+    array('name' => 'user-index', 'path' => '/user-index', 'method' => 'index'),
+    array('name' => 'user-create', 'path' => '/user-create', 'method' => 'create'),
+    array('name' => 'user-edit', 'path' => '/user-edit', 'method' => 'edit'),
+    array('name' => 'user-destroy', 'path' => '/user-delete', 'method' => 'destroy')
+);
 
-$routes->add('user-edit', new Route(constant('PATH_SUBFOLDER') .'/user-edit',
-  array(
-    'controller' => 'UserController',
-    'method'=>'edit'
-  )
-));
-
-$routes->add('user-destroy', new Route(constant('PATH_SUBFOLDER') .'/user-delete',
-  array(
-    'controller' => 'UserController',
-    'method'=>'destroy'
-  )
-));
+addRoutes($routes, $routesDataUser, 'UserController');
