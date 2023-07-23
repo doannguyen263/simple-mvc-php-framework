@@ -63,7 +63,11 @@ View::renderHeader();
         <?php if ($data['list']) : ?>
           <div class="card p-2">
             <div class="card-body p-0  card-overflow">
-
+            <div id="toolbar">
+              <button id="remove" class="btn btn-danger" disabled="">
+                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+              </button>
+            </div>
               <table id="table-list" class="table projects dntheme-list-table">
                 <thead class="text-nowrap">
                   <tr>
@@ -339,6 +343,58 @@ View::renderHeader();
       })
     })
 
+    // Action all delete
+    $('#table-list').change(function() {
+      var checkedCheckboxes = $('#table-list .js-tr input[name="post_id"]:checked');
+        var checkedValues = checkedCheckboxes.map(function() {
+          return $(this).val();
+        }).get();
+        if (checkedValues.length > 0) { 
+          $('#remove').attr("disabled",false)
+        }else{
+          $('#remove').attr("disabled",true)
+        }
+    })
+
+    $('#remove').on("click", function(e) {
+      var checkedCheckboxes = $('.js-tr input[name="post_id"]:checked');
+      var checkedValues = checkedCheckboxes.map(function() {
+        return $(this).val();
+      }).get();
+   
+      if (checkedValues.length > 0) { 
+        let post_ids = checkedValues
+        $(this).addClass("disabled is-loading")
+        $.ajax({
+          url: '<?= SITE_URL . '/backlink-crawler' ?>', // Thay thế bằng URL của endpoint AJAX của bạn
+          method: 'POST',
+          dataType: 'html',
+          data: {
+            action: "destroyMulti",
+            post_ids: post_ids
+          },
+          success: function(response) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Xóa Thành Công!',
+              showConfirmButton: false,
+              timer: 1500
+            })
+            setTimeout(function() {
+              location.reload();
+            }, 1500)
+          },
+          error: function(xhr, status, error) {
+            // Xử lý lỗi tại đây
+            console.log(error);
+          },
+          complete: function() {
+            $('#remove').removeClass("disabled is-loading")
+          }
+        });
+      }
+    })
+    
     // Action get link
     $('.js-get-link').click(function() {
 

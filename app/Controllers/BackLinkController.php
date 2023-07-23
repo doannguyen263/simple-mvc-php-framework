@@ -213,6 +213,30 @@ class BackLinkController
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit;
     }
+    public function destroyMulti()
+    {
+        $post_ids = $this->request->get('post_ids');
+        foreach ($post_ids as $post_id) {
+            $checkAuthor = $this->backlinkModel->checkAuthor($post_id);
+            // Kiểm tra xem người dùng đã đăng nhập và có vai trò admin hay không
+            if (!$checkAuthor && !$this->authModel->isRoleAdmin()) {
+                // Xử lý khi người dùng không có quyền xóa
+                FlashMessage::setFlashMessage('error', 'Bạn không có quyền thực hiện tác vụ này.');
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit;
+            }
+            // Xóa người dùng từ cơ sở dữ liệu
+            $result = $this->backlinkModel->deletePost($post_id);
+
+            if ($result) {
+                FlashMessage::setFlashMessage('success', 'Xóa bản thành công.');
+            } else {
+                FlashMessage::setFlashMessage('error', 'Xóa bản thất bại.');
+            }
+        }
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit;
+    }
 
     function crawler()
     {
@@ -268,6 +292,9 @@ class BackLinkController
         }
         if ($action == 'deletePostMore') {
             $this->deletePostMore($post_id);
+        }
+        if ($action == 'destroyMulti') {
+            $this->destroyMulti();
         }
     }
 
