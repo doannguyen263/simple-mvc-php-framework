@@ -34,44 +34,46 @@ class Pagination
 
     public static function render($totalPages)
     {
-        $currentPage = self::getCurrentPage();
-        $urlPattern = self::getCurrentUrl();
+        if ( $totalPages > 1){
+            $currentPage = self::getCurrentPage();
+            $urlPattern = self::getCurrentUrl();
 
-        echo '<ul class="pagination">';
+            echo '<ul class="pagination mb-0">';
 
-        // Render nút Previous
-        if ($currentPage > 1) {
-            echo '<li class="page-item"><a class="page-link" href="' . self::generatePageUrl($urlPattern, $currentPage - 1) . '">Previous</a></li>';
-        }
-
-        // Render các nút trang
-        $numLinks = 5; // Số lượng liên kết trang để hiển thị
-        $halfNumLinks = floor($numLinks / 2); // Số lượng liên kết trang ở mỗi phía trang hiện tại
-
-        $startPage = max(1, $currentPage - $halfNumLinks);
-        $endPage = min($startPage + $numLinks - 1, $totalPages);
-
-        if ($startPage > 1) {
-            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-        }
-
-        for ($i = $startPage; $i <= $endPage; $i++) {
-            if ($i == $currentPage) {
-                echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
-            } else {
-                echo '<li class="page-item"><a class="page-link" href="' . self::generatePageUrl($urlPattern, $i) . '">' . $i . '</a></li>';
+            // Render nút Previous
+            if ($currentPage > 1) {
+                echo '<li class="page-item"><a class="page-link" href="' . self::generatePageUrl($urlPattern, $currentPage - 1) . '">Previous</a></li>';
             }
-        }
 
-        if ($endPage < $totalPages) {
-            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-        }
+            // Render các nút trang
+            $numLinks = 5; // Số lượng liên kết trang để hiển thị
+            $halfNumLinks = floor($numLinks / 2); // Số lượng liên kết trang ở mỗi phía trang hiện tại
 
-        // Render nút Next
-        if ($currentPage < $totalPages) {
-            echo '<li class="page-item"><a class="page-link" href="' . self::generatePageUrl($urlPattern, $currentPage + 1) . '">Next</a></li>';
-        }
+            $startPage = max(1, $currentPage - $halfNumLinks);
+            $endPage = min($startPage + $numLinks - 1, $totalPages);
 
-        echo '</ul>';
+            if ($startPage > 1) {
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+
+            for ($i = $startPage; $i <= $endPage; $i++) {
+                if ($i == $currentPage) {
+                    echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
+                } else {
+                    echo '<li class="page-item"><a class="page-link" href="' . self::generatePageUrl($urlPattern, $i) . '">' . $i . '</a></li>';
+                }
+            }
+
+            if ($endPage < $totalPages) {
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+
+            // Render nút Next
+            if ($currentPage < $totalPages) {
+                echo '<li class="page-item"><a class="page-link" href="' . self::generatePageUrl($urlPattern, $currentPage + 1) . '">Next</a></li>';
+            }
+
+            echo '</ul>';
+        }
     }
 }

@@ -19,19 +19,17 @@ $user_role = $user['role'] ?? '';
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6 d-flex align-items-center">
-              <h1 class="me-3">Sửa user</h1>
-              <?php if($user_role == 'admin'): ?>
-              <a class="btn btn-info btn-sm" href="<?= SITE_URL ?>/user-create">
+              <h1 class="me-3">Sửa backlink</h1>
+              <a class="btn btn-info btn-sm" href="<?= SITE_URL ?>/backlink-create">
                 <i class="fa-solid fa-user-plus"></i>
                 </i>
-                Thêm User
+                Thêm backlink
               </a>
-              <?php endif; ?>
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="<?= SITE_URL ?>">Home</a></li>
-                <li class="breadcrumb-item active">Edit user</li>
+                <li class="breadcrumb-item active">Edit backlink</li>
               </ol>
             </div>
           </div>
@@ -41,68 +39,61 @@ $user_role = $user['role'] ?? '';
       <div class="content">
         <div class="container-fluid">
           <div class="card card-default color-palette-box">
-
             <div class="card-body">
               <form method="POST" class="mb-3">
               <p class="text-uppercase"><strong>Cập nhật thông tin</strong></p>
               <hr>
                 <div class="row mb-3">
                   <div class="col-md-2">
-                    <label for="formUsername">Username</label>
+                    <label for="formUsername">Link</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="text" name="user_login" value="<?= $user['user_login'] ?>" class="form-control" id="formUsername" placeholder="Enter Username" disabled>
+                    <input type="text" name="link" class="form-control" value="<?= $post['link'] ?>" placeholder="Enter Link" required>
                   </div>
                 </div>
 
                 <div class="row mb-3">
                   <div class="col-md-2">
-                    <label for="formFullName">Họ và tên</label>
+                    <label for="formFullName">ID</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="text" name="user_fullname" value="<?= $user['user_fullname'] ?>" class="form-control" id="formFullName" placeholder="Enter email">
+                    <input type="text" name="content_id" class="form-control" value="<?= $post['content_id'] ?>" placeholder="Enter ID">
                   </div>
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-2">
-                    <label for="formEmail">Email</label>
+                    <label for="formEmail">Class</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="text" name="user_email" value="<?= $user['user_email'] ?>" class="form-control" id="formEmail" placeholder="Enter email">
-                  </div>
-                </div>
-                <hr>
-                <p class="text-uppercase"><strong>Cập nhật mật khẩu</strong></p>
-                <hr>
-                <div class="row mb-3">
-                  <div class="col-md-2">
-                    <label for="formPassword">Mật khẩu hiện tại</label>
-                  </div>
-                  <div class="col-md-10">
-                    <input type="password" name="current_password" class="form-control" id="formPassword" placeholder="Password">
+                    <input type="text" name="content_class" class="form-control" value="<?= $post['content_class'] ?>" placeholder="Enter Class">
                   </div>
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-2">
-                    <label for="formPassword">Mật khẩu mới</label>
+                    <label for="formPassword">Tên đường dẫn</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="password" name="new_password" class="form-control" id="formPassword" placeholder="Password">
+                    <input type="text" name="name_link" class="form-control" value="<?= $post['name_link'] ?>" placeholder="Tên đường dẫn">
                   </div>
                 </div>
+
                 <div class="row mb-3">
                   <div class="col-md-2">
-                    <label for="formPassword">Nhập lại Mật khẩu mới</label>
+                    <label for="formPassword">Danh mục</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="password" name="confirm_password" class="form-control" id="formPassword" placeholder="Password">
+                    <select name="type" class="form-select" aria-label="Default select example">
+                      <option value="onpage" <?php selected($post['type'],'onpage')?>>Onpage</option>
+                      <option value="offpage" <?php selected($post['type'],'offpage')?>>Offpage</option>
+                    </select>
                   </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
                 <input type="hidden" name="action" value="update">
+                <input type="hidden" name="post_id" id="post_id" value="<?= $post['ID'] ?>">
                 <input type="hidden" name="user_id" id="user_id" value="<?= $user['ID'] ?>">
-                <?= CSRFTokenTrait::generateCSRFTokenInput('csrf_user_edit_token') ?>
+                <?= CSRFTokenTrait::generateCSRFTokenInput('csrf_backlink_edit_token') ?>
               </form>
 
               <?php FlashMessage::displayFlashMessage();?>

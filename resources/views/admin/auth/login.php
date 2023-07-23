@@ -1,6 +1,6 @@
 <?php
 use App\Helpers\FlashMessage;
-use App\Helpers\CSRFTokenTrait;
+use App\Middleware\CSRFTokenTrait;
 require_once PATH_VIEWS_ADMIN . '/layout/header.php';
 // Tao pass
 // $password_hash = password_hash('admin', PASSWORD_DEFAULT);

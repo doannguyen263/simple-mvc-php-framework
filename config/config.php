@@ -5,12 +5,15 @@ define('SITE_NAME', 'your-site-name');
 //DB Params
 define('DB_HOST', 'localhost');
 define('DB_USER', 'admin');
-define('DB_PASS', '123456');
 define('DB_NAME', 'test_codethuan_mvc');
+define('DB_PASS', '123456');
 
 //App Root
 define('SITE_URL', 'http://localhost/codethuan/simple-mvc-php-framework');
 define('APP_ROOT', dirname(dirname(__FILE__)));
+
+define('DEFAULT_UPLOAD_DIRECTORY', 'uploads');
+
 
 // PATH
 define('PATH_ROOT', '/');

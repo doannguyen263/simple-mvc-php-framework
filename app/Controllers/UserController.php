@@ -5,9 +5,9 @@ namespace App\Controllers;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\HttpFoundation\Request;
 use App\Helpers\View;
-use App\Helpers\CSRFTokenTrait;
+use App\Middleware\CSRFTokenTrait;
 use App\Helpers\FlashMessage;
-use App\Models\Auth;
+use App\Controllers\AuthController;
 use App\Models\User;
 
 class UserController
@@ -15,20 +15,18 @@ class UserController
     use CSRFTokenTrait;
     use FlashMessage;
 
-    protected $modelAuth;
+    protected $authModel;
     protected $userModel;
     protected $request;
 
     public function __construct()
     {
-        session_start();
+        $userModel = new User;
+        $this->userModel = $userModel;
 
-        $modelUser = new User;
-        $this->userModel = $modelUser;
-
-        $modelAuth = new Auth;
-        $this->modelAuth = $modelAuth;
-        $modelAuth->checkUserLogin();
+        $authModel = new AuthController;
+        $this->authModel = $authModel;
+        $authModel->checkUserLogin();
 
         $this->request = Request::createFromGlobals();
     }
@@ -52,7 +50,7 @@ class UserController
     public function create()
     {
         // Kiểm tra xem người dùng đã đăng nhập và có vai trò admin hay không
-        $this->modelAuth->checkAdmin();
+        $this->authModel->checkRoleAdmin();
 
         $this->store();
         View::render('admin/user/add');
@@ -68,6 +66,13 @@ class UserController
             $user_email = $this->request->get('user_email');
             $user_pass = $this->request->get('user_pass');
             $role = $this->request->get('role');
+
+            $csrf_user_create_token = $this->request->get('csrf_user_create_token');
+            $verifyCSRFToken = CSRFTokenTrait::verifyCSRFToken($csrf_user_create_token, 'csrf_user_create_token');
+
+            if (!$verifyCSRFToken) {
+                FlashMessage::setFlashMessage('error', 'verifyCSRFToken. Cập nhật thất bại.');
+            }
 
             $password_hash = password_hash($user_pass, PASSWORD_DEFAULT);
             $data = array(
@@ -102,12 +107,15 @@ class UserController
             if ($result) {
                 // Nếu thêm thành công, đặt thông báo flash và chuyển hướng đến trang danh sách người dùng
                 FlashMessage::success('Thêm người dùng thành công.');
+                // Thực hiện redirect về trang hiện tại sau khi cập nhật
+                header("Location: user-index");
+                exit;
+                
             } else {
                 // Nếu thêm thất bại, đặt thông báo flash và hiển thị lại biểu mẫu
                 FlashMessage::error('Thêm người dùng thất bại.');
             }
-            // Thực hiện redirect về trang hiện tại sau khi cập nhật
-            header("Location: user-index");
+            header("Location: " . $_SERVER['HTTP_REFERER']);
             exit;
         }
     }
@@ -119,7 +127,7 @@ class UserController
         // Kiểm tra xem người dùng đã đăng nhập và có vai trò admin hay không
         if ($userId && $userId != $_SESSION['user']['ID']) {
             // Xử lý khi người dùng không có quyền xóa
-            $this->modelAuth->checkAdmin();
+            $this->authModel->checkRoleAdmin();
         }
 
 
@@ -150,7 +158,6 @@ class UserController
             $user_fullname = $this->request->get('user_fullname');
             $new_password = $this->request->get('new_password');
             $csrf_user_edit_token = $this->request->get('csrf_user_edit_token');
-
             $verifyCSRFToken = CSRFTokenTrait::verifyCSRFToken($csrf_user_edit_token, 'csrf_user_edit_token');
 
             if (!$verifyCSRFToken) {
@@ -215,7 +222,7 @@ class UserController
         $userId = $this->request->get('user_id');
 
         // Kiểm tra xem người dùng đã đăng nhập và có vai trò admin hay không
-        if (!$this->modelAuth->isAdmin()) {
+        if (!$this->authModel->isRoleAdmin()) {
             // Xử lý khi người dùng không có quyền xóa
             FlashMessage::setFlashMessage('error', 'Bạn không có quyền thực hiện tác vụ này.');
             header("Location: " . $_SERVER['HTTP_REFERER']);

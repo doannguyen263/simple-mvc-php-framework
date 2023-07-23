@@ -6,12 +6,12 @@ use Symfony\Component\Routing\RouteCollection;
 
 use App\Helpers\View;
 
-use App\Models\Auth;
+use App\Controllers\AuthController;
 use App\Models\User;
 
 class PageController
 {
-	protected $userAuth;
+	protected $authModel;
 	protected $userModel;
 
 	public function __construct()
@@ -19,15 +19,13 @@ class PageController
     	$userModel = new User();
       $this->userModel = $userModel;
 
-			$userAuth = new Auth();
-      $this->userAuth = $userAuth;
+			$authModel = new AuthController;
+			$this->authModel = $authModel;
+			$authModel->checkUserLogin();
     }
     // Homepage action
 	public function indexAction(RouteCollection $routes)
 	{
-		session_start();
-		$this->userAuth->checkRole(['admin']);
-
 		// $routeToProduct = str_replace('{id}', 1, $routes->get('product')->getPath());
 		View::render('admin/pages/index');
 	}

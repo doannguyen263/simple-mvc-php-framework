@@ -48,3 +48,14 @@ $routesDataUser = array(
 );
 
 addRoutes($routes, $routesDataUser, 'UserController');
+
+$routesDataBacklink = array(
+  array('name' => 'backlink-index', 'path' => '/backlink-index', 'method' => 'index'),
+  array('name' => 'backlink-create', 'path' => '/backlink-create', 'method' => 'create'),
+  array('name' => 'backlink-edit', 'path' => '/backlink-edit', 'method' => 'edit'),
+  array('name' => 'backlink-destroy', 'path' => '/backlink-delete', 'method' => 'destroy'),
+  array('name' => 'backlink-crawler', 'path' => '/backlink-crawler', 'method' => 'crawler'),
+  array('name' => 'backlink-import', 'path' => '/backlink-import', 'method' => 'importFromCSV'),
+);
+
+addRoutes($routes, $routesDataBacklink, 'BackLinkController');

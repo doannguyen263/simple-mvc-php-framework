@@ -16,6 +16,18 @@ class User
         $this->db = MysqliDb::getInstance();
     }
 
+    public function getUserCurrent()
+    {
+        $userId = $_SESSION['user']['ID'];
+        return $this->db
+            ->where('ID', $userId)
+            ->getOne($this->tableName, ['ID', 'user_login', 'user_fullname', 'user_email', 'role']);
+    }
+    public function getUserCurrentID()
+    {
+        return $_SESSION['user']['ID'];
+    }
+
     public function getUserByUsername($username)
     {
         return $this->db
@@ -80,7 +92,7 @@ class User
         if (empty($data)) {
             return false; // Hoặc xử lý theo nhu cầu của bạn
         }
-
+        $data['created_at'] = $this->db->now();
         $result = $this->db->insert($this->tableName, $data);
         return $result;
     }

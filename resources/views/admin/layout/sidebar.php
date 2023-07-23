@@ -1,17 +1,42 @@
 <?php
-
 use Symfony\Component\HttpFoundation\Request;
+$user = $_SESSION['user'];
+$user_name = $user['user_login'] ?? '';
+$user_role = $user['role'] ?? '';
+$request = Request::createFromGlobals();
+$currentRoute = $request->query->get('route');
 
-$user_name = $_SESSION['user']['user_login'] ?? '';
-
-$Request = Request::createFromGlobals();
-$currentRoute = $Request->query->get('route');
 $menus = array(
+  array(
+    'name' => 'Backlink',
+    'link' => SITE_URL . '/backlink-index',
+    'route' => 'backlink-index',
+    'icon' => 'fa-regular fa-rectangle-list',
+    'type' => '',
+    'submenu' => array(
+      array(
+        'name' => 'Danh sách',
+        'link' => SITE_URL . '/backlink-index',
+        'route' => 'backlink-index'
+      ),
+      array(
+        'name' => 'Thêm mới',
+        'link' => SITE_URL . '/backlink-create',
+        'route' => 'backlink-create'
+      ),
+      array(
+        'name' => 'Import From CSV',
+        'link' => SITE_URL . '/backlink-import',
+        'route' => 'backlink-import'
+      ),
+    )
+  ),
   array(
     'name' => 'User',
     'link' => SITE_URL . '/user-index',
     'route' => 'user-index',
     'icon' => 'fa-solid fa-users',
+    'type' => 'admin',
     'submenu' => array(
       array(
         'name' => 'Danh sách',
@@ -38,7 +63,7 @@ $menus = array(
 $activeMenuIndex = null;
 $activeSubmenuIndex = null;
 
-$currentRoute = $Request->query->get('route');
+$currentRoute = $request->query->get('route');
 
 foreach ($menus as $menuIndex => $menu) {
 
@@ -95,6 +120,8 @@ foreach ($menus as $menuIndex => $menu) {
           <?php
           $isActiveMenu = $menuIndex === $activeMenuIndex;
           $isActiveSubmenu = $isActiveMenu && $activeSubmenuIndex !== null;
+
+          if($menu['type'] == 'admin' && $user_role == 'user') break;
           ?>
           <li class="nav-item <?= $isActiveMenu ? 'menu-open' : '' ?>">
             <a href="#" class="nav-link">

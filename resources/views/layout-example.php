@@ -13,5 +13,9 @@ View::addAfterFooter( 'addAfterFooter' );
 <?php View::renderHeader();?>
 
 Content
-
-<?php View::renderFooter(); ?>
+<?php
+ob_start(); ?>
+<!-- code -->
+<?php $addAfterFooter = ob_get_clean();
+View::addAfterFooter($addAfterFooter);
+View::renderFooter(); ?>

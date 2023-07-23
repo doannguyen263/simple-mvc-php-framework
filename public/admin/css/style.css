@@ -1,7 +1,124 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+.is-loading:after {
+  content: "";
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: -0.125em;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  -webkit-animation: .75s linear infinite spinner-border;
+  animation: .75s linear infinite spinner-border;
+}
+.modal-fullscreen {
+  width: 100vw;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+}
 .w-100 {
   width: 100%;
 }
-
-.navbar-nav>.user-menu>.dropdown-menu {
+.sidebar {
+  font-size: 14px;
+}
+.navbar-nav > .user-menu > .dropdown-menu {
   width: 100%;
+}
+/**/
+.table {
+  font-size: 14px;
+}
+.table td, .table th {
+  padding: 0.25rem;
+}
+.card-body.p-0 .table tbody>tr>td:first-of-type, .card-body.p-0 .table tbody>tr>th:first-of-type, .card-body.p-0 .table tfoot>tr>td:first-of-type, .card-body.p-0 .table tfoot>tr>th:first-of-type, .card-body.p-0 .table thead>tr>td:first-of-type, .card-body.p-0 .table thead>tr>th:first-of-type {
+  padding-left: 1rem;
+}
+.card-body.p-0 .table tbody>tr>td:last-of-type, .card-body.p-0 .table tbody>tr>th:last-of-type, .card-body.p-0 .table tfoot>tr>td:last-of-type, .card-body.p-0 .table tfoot>tr>th:last-of-type, .card-body.p-0 .table thead>tr>td:last-of-type, .card-body.p-0 .table thead>tr>th:last-of-type {
+  padding-right: 1rem;
+}
+.table-active, .table-active>td, .table-active>th {
+  background-color: transparent;
+}
+
+/* Custom Checkbox */
+.custom-checkbox {
+  display: inline-flex;
+  position: relative;
+  height: 18px;
+  padding-left: 20px;
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #2196f3;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+.custom-checkbox .checkmark:after {
+  left: 7px;
+  top: 2px;
+  width: 7px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.table-list__tab:not(.active) {
+  display: none;
+}
+/**/
+.content-backlink .card-overflow {
+  height: 50vh;
+  min-height: 500px;
+  overflow: auto;
+}
+.table-header thead th {
+  border: 0;
+}
+
+tr.js-row-autosave.is-sending td {
+  background: rgb(0 0 0 / 4%);
+  pointer-events: none;
+}
+tr.js-row-autosave.is-done td {
+  background: #83ff88;
 }
