@@ -1,3 +1,7 @@
+.form-select {
+  padding: .375rem 2.25rem .375rem .55rem;
+  background-position: right 0.55rem center;
+}
 .cursor-pointer {
   cursor: pointer;
 }
@@ -107,8 +111,7 @@
 }
 /**/
 .content-backlink .card-overflow {
-  height: 50vh;
-  min-height: 500px;
+  height: calc(50vh - 150px);
   overflow: auto;
 }
 .table-header thead th {

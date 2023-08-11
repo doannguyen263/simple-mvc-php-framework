@@ -60,17 +60,55 @@ class BackLink
         ];
     }
 
-    public function getBackLinksWithPagination($currentPage, $perPage = 10)
+    public function getBackLinksWithPagination($currentPage, $perPage = 10, $search_params)
     {
+
         $getUserCurrentID = $this->userModel->getUserCurrentID();
         $this->db->pageLimit = $perPage;
 
         $this->db->join("backlinks_more bm", "bm.post_id=bl.ID", "LEFT");
-        $this->db->where("bl.user_id", $getUserCurrentID)->orderBy('bl.ID', 'DESC');
+
+        // search
+        if($search_params['keyword']){
+            $this->db->where("bm.keyword", '%'.$search_params['keyword'].'%', 'like');
+        }
+        if($search_params['link']){
+            $this->db->where("bl.link", '%'.$search_params['link'].'%', 'like');
+        }
+        if($search_params['name_link']){
+            $this->db->where("bl.name_link", '%'.$search_params['name_link'].'%', 'like');
+        }
+        if($search_params['type']){
+            $this->db->where("bl.type", $search_params['type']);
+        }
+        // end search
+
+        $this->db->where("bl.user_id", $getUserCurrentID);
+        
+        if($search_params['order_by'] && $search_params['sort']) {
+            $this->db->orderBy($search_params['order_by'], $search_params['sort']);
+        }
+       
         $this->db->groupBy ("bl.ID");
         $result = 
-        $this->db->arraybuilder()->paginate("backlinks bl", $currentPage, " bl.ID, bl.link, bl.content_id, bl.content_class, bl.name_link, bl.type, bl.user_id, COUNT(CASE WHEN bm.post_id IS NOT NULL THEN bl.ID END) AS count_more");
-    
+        $this->db->arraybuilder()
+        ->paginate(
+            "backlinks bl", $currentPage, 
+            " bl.ID, bl.link, bl.content_id, bl.content_class, bl.name_link, 
+            bl.type, bl.user_id, bl.incoming_links, (
+                SELECT
+                    COUNT(blm.ID)
+                FROM
+                    backlinks_more blm
+                LEFT JOIN backlinks bl1 ON
+                    blm.post_id = bl1.ID
+                WHERE
+                    bl1.user_id = '".$getUserCurrentID."' AND bl1.type = 'onpage' AND bl1.link != bl.link AND blm.internal_links = bl.link
+            ) AS count_internal_links"
+        );
+        echo '<pre>';
+        print_r($this->db->getLastQuery());
+        echo '</pre>';
         $totalPages = $this->db->totalPages;
         $totalRecords = $this->db->totalCount;
 
@@ -84,6 +122,8 @@ class BackLink
     function count_internal_links($user_id, $post_id,$post_link) {
         $this->db->join("backlinks bl", "blm.post_id=bl.ID", "LEFT");
         $this->db->where("bl.user_id", $user_id);
+        $this->db->where("bl.type", 'onpage');
+        $this->db->where("bl.link", $post_link, "!=");
         $result = $this->db
             ->where('post_id', $post_id, '!=')->where('internal_links', $post_link)->get("backlinks_more blm", null, " COUNT(blm.ID) AS count_internal_links");
             return $result;
@@ -141,12 +181,15 @@ class BackLink
                 'content_class' => '',
                 'name_link' => '',
                 'type' => '',
+                'incoming_links' => '',
             ]
         );
 
+ 
         if (empty($data)) {
             return false; // Hoặc xử lý theo nhu cầu của bạn
         }
+
         $data['updated_at'] = $this->db->now();
         $this->db->where('ID', $post_id);
         $this->db->update($this->tableName, $data);

@@ -50,7 +50,7 @@ $user_id = $_SESSION['user']['ID'];
                     <label for="formFullName">ID</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="text" name="content_id" class="form-control" placeholder="Enter ID">
+                    <input type="text" name="content_id" class="form-control" placeholder="Enter ID Ví dụ: #content">
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -58,7 +58,7 @@ $user_id = $_SESSION['user']['ID'];
                     <label for="formEmail">Class</label>
                   </div>
                   <div class="col-md-10">
-                    <input type="text" name="content_class" class="form-control"  placeholder="Enter Class">
+                    <input type="text" name="content_class" class="form-control"  placeholder="Enter Class Ví dụ .classA hoặc .classA.classB">
                   </div>
                 </div>
                 <div class="row mb-3">

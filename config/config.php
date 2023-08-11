@@ -4,12 +4,12 @@ define('SITE_NAME', 'your-site-name');
 
 //DB Params
 define('DB_HOST', 'localhost');
-define('DB_USER', 'admin');
-define('DB_NAME', 'test_codethuan_mvc');
-define('DB_PASS', '123456');
+define('DB_USER', 'demoweb247_mvc');
+define('DB_NAME', 'demoweb247_mvc');
+define('DB_PASS', '84XUSnm2wQ');
 
 //App Root
-define('SITE_URL', 'http://localhost/codethuan/simple-mvc-php-framework');
+define('SITE_URL', 'https://demoweb247.store/mvc');
 define('APP_ROOT', dirname(dirname(__FILE__)));
 
 define('DEFAULT_UPLOAD_DIRECTORY', 'uploads');
@@ -17,7 +17,7 @@ define('DEFAULT_UPLOAD_DIRECTORY', 'uploads');
 
 // PATH
 define('PATH_ROOT', '/');
-define('PATH_SUBFOLDER', '/codethuan/simple-mvc-php-framework');
+define('PATH_SUBFOLDER', '/mvc');
 
 define('PATH_VIEWS_CORE', APP_ROOT.'/resources/views/core');
 define('PATH_VIEWS', APP_ROOT.'/resources/views');

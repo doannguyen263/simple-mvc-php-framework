@@ -9,6 +9,14 @@ $currentUser = $_SESSION['user'];
 
 $backlinkModel = new BackLink;
 
+
+$keyword = trim($request->get('keyword'));
+$link = trim($request->get('link'));
+$name_link = trim($request->get('name_link'));
+$type = $request->get('type');
+$order_by = $request->get('order_by');
+// $sort = $request->get('sort');
+
 View::renderHeader();
 
 
@@ -26,19 +34,16 @@ View::renderHeader();
             <div class="col-sm-6 d-flex align-items-center">
               <h1 class="me-2">Danh sách</h1>
               <a class="btn btn-info btn-sm me-2" href="<?= SITE_URL ?>/backlink-create">
-                <i class="fa-solid fa-user-plus"></i>
-                </i>
+                <i class="fa-regular fa-calendar-plus"></i>
                 Thêm Backlink
               </a>
 
               <button class="btn btn-info btn-sm js-get-link me-2">
                 <i class="fa-brands fa-searchengin"></i>
-                </i>
                 Get link
               </button>
               <button class="btn btn-info btn-sm js-check-link me-2">
                 <i class="fa-solid fa-list-check"></i>
-                </i>
                 Check link
               </button>
             </div>
@@ -60,14 +65,39 @@ View::renderHeader();
           echo '</div>';
         }
         ?>
+
+        <div id="toolbar" class="d-flex pt-2 mb-3">
+            <button id="remove" class="btn btn-danger me-2" disabled="">
+              <i class="fa fa-trash" aria-hidden="true"></i> Delete
+            </button>
+
+            <form method="GET" action="<?= SITE_URL ?>/backlink-index" class="d-flex">
+              <input type="hidden" name="action" value="search">
+              <input type="text" name="keyword" class="form-control me-2" value="<?= $keyword ?>" placeholder="Search keyword">
+              <input type="text" name="link" class="form-control me-2" value="<?= $link ?>" placeholder="Search Link">
+              <input type="text" name="name_link" class="form-control me-2" value="<?= $name_link ?>" placeholder="Search tên đường dẫn">
+              <select name="type" class="form-select me-2" style="width:120px">
+                <option value="" <?php selected('',$type) ?>>Danh mục</option>
+                <option value="onpage" <?php selected('onpage',$type) ?>>Onpage</option>
+                <option value="offpage" <?php selected('offpage',$type) ?>>Offpage</option>
+              </select>
+
+              <select name="order_by" class="form-select me-2" style="width:110px">
+                <option value="" <?php selected('',$order_by) ?>>Order</option>
+                <option value="incoming_links-ASC" <?php selected('incoming_links-ASC',$order_by) ?>>SL đi tăng dần</option>
+                <option value="incoming_links-DESC" <?php selected('incoming_links-DESC',$order_by) ?>>SL đi giảm dần</option>
+                <option value="count_internal_links-ASC" <?php selected('count_internal_links-ASC',$order_by) ?>>SL đến tăng dần</option>
+                <option value="count_internal_links-DESC" <?php selected('count_internal_links-DESC',$order_by) ?>>SL đến giảm dần</option>
+              </select>
+
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+          </div>
+          
         <?php if ($data['list']) : ?>
           <div class="card p-2">
             <div class="card-body p-0  card-overflow">
-            <div id="toolbar">
-              <button id="remove" class="btn btn-danger" disabled="">
-                <i class="fa fa-trash" aria-hidden="true"></i> Delete
-              </button>
-            </div>
+          
               <table id="table-list" class="table projects dntheme-list-table">
                 <thead class="text-nowrap">
                   <tr>
@@ -130,12 +160,19 @@ View::renderHeader();
                         <?= $item['type'] ?>
                       </td>
                       <td>
-                        <?= isset($item['count_more']) ? $item['count_more']  : 0 ?>
+                        <?php
+                          echo isset($item['incoming_links']) ? $item['incoming_links']  : 0;
+                         ?>
                       </td>
                       <td>
                         <?php
-                        $count_internal_links = $backlinkModel->count_internal_links($currentUser['ID'], $item['ID'], $item['link']);
-                        echo isset($count_internal_links[0]['count_internal_links']) ? $count_internal_links[0]['count_internal_links'] : 0;
+                        if($item['type'] == 'onpage') {
+                          echo isset($item['count_internal_links']) ? $item['count_internal_links']  : 0;
+                          // $count_internal_links = $backlinkModel->count_internal_links($currentUser['ID'], $item['ID'], $item['link']);
+                          // echo isset($count_internal_links[0]['count_internal_links']) ? $count_internal_links[0]['count_internal_links'] : 0;
+                        }else {
+                          echo '-';
+                        }
                         ?>
                       </td>
                       <td class="project-actions text-right">
@@ -193,7 +230,7 @@ View::renderHeader();
                   <table id="table-child2" class="table table-bordered" data-post_id="">
                     <thead>
                       <tr>
-                        <th scope="col" style="width: 25%;">Link trỏ đến</th>
+                        <th scope="col" style="width: 25%;">Link trỏ từ</th>
                         <th scope="col" style="width: 25%;">Keyword</th>
                         <th scope="col" style="width: 90px;">Note</th>
                       </tr>
@@ -257,7 +294,9 @@ View::renderHeader();
 
           </div>
         <?php else : ?>
+          <div class="card p-2">
           <div class="alert alert-info mt-3 mx-3">No data</div>
+          </div>
         <?php endif; ?>
       </div>
     </div>

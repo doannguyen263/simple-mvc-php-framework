@@ -46,16 +46,36 @@ class BackLinkController
 
     public function index()
     {
-        $page = $this->request->get('page') ?? 1;
-        $perPage = 10;
+        $keyword = $this->request->get('keyword');
+        $link = $this->request->get('link');
+        $name_link = $this->request->get('name_link');
+        $type = $this->request->get('type');
+        $get_orderby = $this->request->get('order_by');
+        $explode_orderby = explode("-", $get_orderby);
+        $order_by = isset($explode_orderby[0]) ? $explode_orderby[0] : '';
+        $sort = isset($explode_orderby[1]) ? $explode_orderby[1] : '';
 
-        $data = $this->backlinkModel->getBackLinksWithPagination($page, $perPage);
+        // $sort = $this->request->get('sort');
+
+        $search_params = [
+            'keyword' => trim($keyword),
+            'link' => trim($link),
+            'name_link' => trim($name_link),
+            'type' => $type,
+            'order_by' => $order_by,
+            'sort' => $sort,
+        ];
+        
+        $page = $this->request->get('page') ?? 1;
+        $perPage = 1000;
+
+        $data = $this->backlinkModel->getBackLinksWithPagination($page, $perPage,$search_params);
 
         // Kiểm tra dữ liệu có tồn tại hay không
         if (empty($data['data']) && $page > 1) {
             $totalPages = $data['totalPages'];
             $nextPage = min($totalPages, $page + 1);
-            $data = $this->backlinkModel->getBackLinksWithPagination($nextPage, $perPage);
+            $data = $this->backlinkModel->getBackLinksWithPagination($nextPage, $perPage,$search_params);
             header('Location: backlink-index?page=' . $nextPage);
             exit();
         }
@@ -65,8 +85,10 @@ class BackLinkController
             'list' => $data['data'],
             'page' => $page,
             'perPage' => $perPage,
-            'totalPages' => $data['totalPages']
+            'totalPages' => $data['totalPages'],
+            'request' => $this->request
         ];
+        
         View::render('admin/backlink/index', $data);
     }
 
@@ -107,6 +129,7 @@ class BackLinkController
             // Thực hiện kiểm tra và thêm người dùng vào cơ sở dữ liệu
             $result = $this->backlinkModel->addBackLink($data);
             if ($result) {
+                $this->crawlerGetLink(array($result));
                 // Nếu thêm thành công, đặt thông báo flash và chuyển hướng đến trang danh sách người dùng
                 FlashMessage::success('Thêm bản ghi thành công.');
                 // Thực hiện redirect về trang hiện tại sau khi cập nhật
@@ -174,6 +197,7 @@ class BackLinkController
             $result = $this->backlinkModel->updatePost($post_id, $data);
 
             if ($result) {
+                $this->crawlerGetLink(array($post_id));
                 FlashMessage::setFlashMessage('success', 'Cập nhật bản ghi thành công.');
             } else {
                 FlashMessage::setFlashMessage('error', 'Cập nhật bản ghi thất bại.');
@@ -305,10 +329,16 @@ class BackLinkController
         $crawlerHelper = new CrawlerHelper();
         $links = [];
         foreach ($posts as $post) {
-            $filterSection = ($post['content_id']) ? $post['content_id'] : $post['content_class'];
-            $filterLink = $post['name_link'];
-            if (filter_var($post['link'], FILTER_VALIDATE_URL)) {
-                $links[] = $crawlerHelper->crawlLinks($post['link'], $filterSection, $filterLink, $post['ID']);
+            $post_type = ($post['type']) ? $post['type'] : $post['type'];
+            if ($post_type == 'onpage') {
+       
+                $filterSection = ($post['content_id']) ? $post['content_id'] : $post['content_class'];
+                $filterLink = $post['name_link'];
+                if (filter_var($post['link'], FILTER_VALIDATE_URL)) {
+                    $get_links = $crawlerHelper->crawlLinks($post['link'], $filterSection, $filterLink, $post['ID']);
+                    $links[] = $get_links;
+                    $this->backlinkModel->updatePost($post['ID'], array('incoming_links' => count($get_links)) );
+                }
             }
             
         }
@@ -316,14 +346,19 @@ class BackLinkController
         if ($links) {
             foreach ($links as $post) {
                 if ($post) {
-                    $this->db->where('post_id', $post[0]['post_id'])->delete('backlinks_more');
-                    $this->db->where('post_id', $post[0]['post_id'])->delete('backlinks_more_checklink');
-                    $ids = $this->db->insertMulti('backlinks_more', $post);
-                    if (!$ids) {
-                        echo 'insert failed: ' . $this->db->getLastError();
-                    } else {
-                        echo 'new users inserted with following id\'s: ' . implode(', ', $ids);
+                    try {
+                        $this->db->where('post_id', $post[0]['post_id'])->delete('backlinks_more');
+                        $this->db->where('post_id', $post[0]['post_id'])->delete('backlinks_more_checklink');
+                        $ids = $this->db->insertMulti('backlinks_more', $post);
+                        if (!$ids) {
+                            echo 'insert failed: ' . $this->db->getLastError();
+                        } else {
+                            echo 'new users inserted with following id\'s: ' . implode(', ', $ids);
+                        }
+                    } catch (\Throwable $th) {
+                        //throw $th;
                     }
+                    
                 }
             }
         }
@@ -425,13 +460,14 @@ class BackLinkController
 
             $this->db->join("backlinks bl", "blm.post_id=bl.ID", "LEFT");
             $this->db->where("bl.user_id", $user_id);
+            $this->db->where("bl.link", $post['link'], "!=");
             $result = $this->db
-                ->where('post_id', $post_id, '!=')->where('internal_links', $post['link'])->get("backlinks_more blm", null, "blm.ID, internal_links, keyword, note");
-            foreach ($result as $item) {
+                ->where('post_id', $post_id, '!=')->where('internal_links', $post['link'])->get("backlinks_more blm", null, "blm.ID, internal_links, keyword, note, bl.link");
+                foreach ($result as $item) {
             ?>
                 <tr class="js-row-autosave" data-post_id="<?= $item['ID'] ?>">
                     <td>
-                        <?= $item['internal_links'] ?>
+                        <?= $item['link'] ?>
                         <input type="hidden" name="ID" value="<?= $item['ID'] ?>">
                         <input type="hidden" name="internal_links" value="<?= $item['internal_links'] ?>">
                     </td>
